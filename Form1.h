@@ -18,6 +18,23 @@ namespace CppCLRWinformsProjekt {
 	using namespace System::Drawing;
 	using namespace System::Security::Cryptography;
 
+	int lenght = 0;
+	int* num = 0;
+
+	//NIST constants
+	static const double	rel_error = 1E-12;
+
+	double MACHEP = 1.11022302462515654042E-16;		// 2**-53
+	double MAXLOG = 7.09782712893383996732224E2;	// log(MAXNUM)
+	double MAXNUM = 1.7976931348623158E308;			// 2**1024*(1-MACHEP)
+	double PI = 3.14159265358979323846;			// pi, duh!
+
+	static double big = 4.503599627370496e15;
+	static double biginv = 2.22044604925031308085e-16;
+
+	int sgngam = 0;
+	//NIST constants
+
 	/// <summary>
 	/// Zusammenfassung für Form1
 	/// </summary>
@@ -31,13 +48,19 @@ namespace CppCLRWinformsProjekt {
 			//TODO: Konstruktorcode hier hinzufügen.
 			//
 		}
-		int lenght = 0;
-		int* num = 0;
+		
 	private: System::Windows::Forms::CheckBox^ checkBox4;
 	private: System::Windows::Forms::TextBox^ textBox4;
 	private: System::Windows::Forms::TextBox^ textBox5;
 	private: System::Windows::Forms::CheckBox^ checkBox5;
 	private: System::Windows::Forms::CheckBox^ checkBox6;
+	private: System::Windows::Forms::ProgressBar^ progressBar1;
+
+
+
+
+
+
 
 
 	public:
@@ -100,6 +123,7 @@ namespace CppCLRWinformsProjekt {
 			this->textBox5 = (gcnew System::Windows::Forms::TextBox());
 			this->checkBox5 = (gcnew System::Windows::Forms::CheckBox());
 			this->checkBox6 = (gcnew System::Windows::Forms::CheckBox());
+			this->progressBar1 = (gcnew System::Windows::Forms::ProgressBar());
 			this->SuspendLayout();
 			// 
 			// textBox1
@@ -152,16 +176,17 @@ namespace CppCLRWinformsProjekt {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(42, 272);
+			this->label3->Location = System::Drawing::Point(12, 230);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(66, 17);
+			this->label3->Size = System::Drawing::Size(149, 17);
 			this->label3->TabIndex = 5;
-			this->label3->Text = L"Test serii";
+			this->label3->Text = L"Test czêstotliwoœciowy";
+			this->label3->Click += gcnew System::EventHandler(this, &Form1::label3_Click);
 			// 
 			// checkBox1
 			// 
 			this->checkBox1->AutoSize = true;
-			this->checkBox1->Location = System::Drawing::Point(165, 271);
+			this->checkBox1->Location = System::Drawing::Point(165, 226);
 			this->checkBox1->Name = L"checkBox1";
 			this->checkBox1->Size = System::Drawing::Size(80, 21);
 			this->checkBox1->TabIndex = 6;
@@ -171,7 +196,7 @@ namespace CppCLRWinformsProjekt {
 			// label4
 			// 
 			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(42, 320);
+			this->label4->Location = System::Drawing::Point(12, 287);
 			this->label4->Name = L"label4";
 			this->label4->Size = System::Drawing::Size(114, 17);
 			this->label4->TabIndex = 7;
@@ -180,7 +205,7 @@ namespace CppCLRWinformsProjekt {
 			// checkBox2
 			// 
 			this->checkBox2->AutoSize = true;
-			this->checkBox2->Location = System::Drawing::Point(165, 320);
+			this->checkBox2->Location = System::Drawing::Point(165, 284);
 			this->checkBox2->Name = L"checkBox2";
 			this->checkBox2->Size = System::Drawing::Size(80, 21);
 			this->checkBox2->TabIndex = 8;
@@ -189,7 +214,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// textBox3
 			// 
-			this->textBox3->Location = System::Drawing::Point(344, 272);
+			this->textBox3->Location = System::Drawing::Point(344, 226);
 			this->textBox3->Name = L"textBox3";
 			this->textBox3->Size = System::Drawing::Size(277, 22);
 			this->textBox3->TabIndex = 9;
@@ -197,7 +222,7 @@ namespace CppCLRWinformsProjekt {
 			// label5
 			// 
 			this->label5->AutoSize = true;
-			this->label5->Location = System::Drawing::Point(42, 375);
+			this->label5->Location = System::Drawing::Point(12, 340);
 			this->label5->Name = L"label5";
 			this->label5->Size = System::Drawing::Size(100, 17);
 			this->label5->TabIndex = 10;
@@ -207,7 +232,7 @@ namespace CppCLRWinformsProjekt {
 			// checkBox3
 			// 
 			this->checkBox3->AutoSize = true;
-			this->checkBox3->Location = System::Drawing::Point(165, 375);
+			this->checkBox3->Location = System::Drawing::Point(165, 342);
 			this->checkBox3->Name = L"checkBox3";
 			this->checkBox3->Size = System::Drawing::Size(80, 21);
 			this->checkBox3->TabIndex = 11;
@@ -216,7 +241,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// button2
 			// 
-			this->button2->Location = System::Drawing::Point(53, 432);
+			this->button2->Location = System::Drawing::Point(45, 461);
 			this->button2->Name = L"button2";
 			this->button2->Size = System::Drawing::Size(155, 45);
 			this->button2->TabIndex = 12;
@@ -234,7 +259,7 @@ namespace CppCLRWinformsProjekt {
 			this->checkBox4->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 			this->checkBox4->ForeColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(192)), static_cast<System::Int32>(static_cast<System::Byte>(0)),
 				static_cast<System::Int32>(static_cast<System::Byte>(0)));
-			this->checkBox4->Location = System::Drawing::Point(652, 275);
+			this->checkBox4->Location = System::Drawing::Point(652, 226);
 			this->checkBox4->Name = L"checkBox4";
 			this->checkBox4->Size = System::Drawing::Size(49, 21);
 			this->checkBox4->TabIndex = 13;
@@ -243,14 +268,14 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// textBox4
 			// 
-			this->textBox4->Location = System::Drawing::Point(344, 320);
+			this->textBox4->Location = System::Drawing::Point(344, 284);
 			this->textBox4->Name = L"textBox4";
 			this->textBox4->Size = System::Drawing::Size(277, 22);
 			this->textBox4->TabIndex = 14;
 			// 
 			// textBox5
 			// 
-			this->textBox5->Location = System::Drawing::Point(344, 375);
+			this->textBox5->Location = System::Drawing::Point(344, 342);
 			this->textBox5->Name = L"textBox5";
 			this->textBox5->Size = System::Drawing::Size(277, 22);
 			this->textBox5->TabIndex = 15;
@@ -264,7 +289,7 @@ namespace CppCLRWinformsProjekt {
 			this->checkBox5->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 			this->checkBox5->ForeColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(192)), static_cast<System::Int32>(static_cast<System::Byte>(0)),
 				static_cast<System::Int32>(static_cast<System::Byte>(0)));
-			this->checkBox5->Location = System::Drawing::Point(652, 321);
+			this->checkBox5->Location = System::Drawing::Point(652, 282);
 			this->checkBox5->Name = L"checkBox5";
 			this->checkBox5->Size = System::Drawing::Size(49, 21);
 			this->checkBox5->TabIndex = 16;
@@ -280,18 +305,29 @@ namespace CppCLRWinformsProjekt {
 			this->checkBox6->FlatStyle = System::Windows::Forms::FlatStyle::Flat;
 			this->checkBox6->ForeColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(192)), static_cast<System::Int32>(static_cast<System::Byte>(0)),
 				static_cast<System::Int32>(static_cast<System::Byte>(0)));
-			this->checkBox6->Location = System::Drawing::Point(652, 373);
+			this->checkBox6->Location = System::Drawing::Point(652, 340);
 			this->checkBox6->Name = L"checkBox6";
 			this->checkBox6->Size = System::Drawing::Size(49, 21);
 			this->checkBox6->TabIndex = 17;
 			this->checkBox6->Text = L"OK!";
 			this->checkBox6->UseVisualStyleBackColor = false;
 			// 
+			// progressBar1
+			// 
+			this->progressBar1->Location = System::Drawing::Point(340, 30);
+			this->progressBar1->Name = L"progressBar1";
+			this->progressBar1->Size = System::Drawing::Size(417, 47);
+			this->progressBar1->Step = 1;
+			this->progressBar1->Style = System::Windows::Forms::ProgressBarStyle::Continuous;
+			this->progressBar1->TabIndex = 18;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
+			this->BackColor = System::Drawing::Color::CadetBlue;
 			this->ClientSize = System::Drawing::Size(786, 544);
+			this->Controls->Add(this->progressBar1);
 			this->Controls->Add(this->checkBox6);
 			this->Controls->Add(this->checkBox5);
 			this->Controls->Add(this->textBox5);
@@ -321,16 +357,22 @@ namespace CppCLRWinformsProjekt {
 
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 		textBox2->Text = "";
-		lenght = Convert::ToSingle(textBox1->Text);
+		progressBar1->Value = 0;
+		lenght = Convert::ToInt32(textBox1->Text);
 		num = new int[lenght];
 		srand(time(0));
 		for (int i = 0; i < lenght; ++i) {
 			num[i] = rand() % 2;
 			textBox2->Text += Convert::ToString(num[i]);
 			textBox2->Text += " ";
+			if (lenght < 100)
+				progressBar1->Value = 100;
+			else {
+				int con = i % (lenght / 100);
+				if (con == 0)
+					progressBar1->PerformStep();
+			}
 		}
-
-
 
 	}
 	private: System::Void Form1_Load(System::Object^ sender, System::EventArgs^ e) {
@@ -344,7 +386,7 @@ namespace CppCLRWinformsProjekt {
 		}
 		return val;
 	}
-	protected: System::Void esn() {
+protected: System::Void esn() {
 		for (int i = 0; i < lenght; ++i) {
 			if (num[i] == 0)
 				sn = sn - 1;
@@ -352,59 +394,63 @@ namespace CppCLRWinformsProjekt {
 				sn = sn + 1;
 		}
 	}
-private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
-	textBox3->Text = " ";
-	textBox4->Text = " ";
-	textBox5->Text = " ";
-	checkBox4->Checked = false;
-	checkBox5->Checked = false;
-	checkBox6->Checked = false;
+	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
+		textBox3->Text = " ";
+		textBox4->Text = " ";
+		textBox5->Text = " ";
+		checkBox4->Checked = false;
+		checkBox5->Checked = false;
+		checkBox6->Checked = false;
 
-	if (checkBox1->Checked) {
-		esn();
-		double Pvalue = erfc(abs(sn) / sqrt(lenght));
-		textBox3->Text += "Pvalue: ";
-		textBox3->Text += Convert::ToString(Pvalue);
-		if (Pvalue > 0.01)
-			checkBox4->Checked = true;
-	}
-	if (checkBox2->Checked) {
-		int jedynka = 0;
-		for (int i = 0; i < lenght; ++i) {
-			if (num[i] == 1)
-				jedynka += 1;
+		if (checkBox1->Checked) {
+			esn();
+			double Pvalue = erfc(abs(sn) / sqrt(lenght));
+			textBox3->Text += "Pvalue: ";
+			textBox3->Text += Convert::ToString(Pvalue);
+			if (Pvalue > 0.01)
+				checkBox4->Checked = true;
 		}
-		double min = 9725.0 / 20000.0 * lenght;
-		double max = 10275.0 / 20000.0 * lenght;
-		textBox4->Text += "Liczba wystapieñ jedynek: ";
-		textBox4->Text += Convert::ToString(jedynka);
-		if (jedynka > min && jedynka<max) {
-			checkBox5->Checked = true;
-		}
+		if (checkBox2->Checked) {
+			int jedynka = 0;
+			for (int i = 0; i < lenght; ++i) {
+				if (num[i] == 1)
+					jedynka += 1;
+			}
+			double min = 9725.0 / 20000.0 * lenght;
+			double max = 10275.0 / 20000.0 * lenght;
+			textBox4->Text += "Liczba wystapieñ jedynek: ";
+			textBox4->Text += Convert::ToString(jedynka);
+			if (jedynka > min && jedynka < max) {
+				checkBox5->Checked = true;
+			}
 
-	}
-	if (checkBox3->Checked) {
-		int func[15] = {};
-		int liczba = 0;
-		for (int i = 0; i <= lenght-3-lenght%4; i += 4) {
-			liczba = num[i] * 1 + num[i + 1] * 2 + num[i + 2] * 4 + num[i + 3] * 8;
-			//textBox5->Text += Convert::ToString(liczba); textBox5->Text += ";";
-			func[liczba] = func[liczba]+1;
 		}
-		double chi = 0;
-		for (int j = 0; j < 15; ++j) {
-			chi = chi+16.0 / lenght * 4.0 * pow(func[j],2);
+		if (checkBox3->Checked) {
+			int func[16] = { 0 };
+			int liczba = 0;
+			for (int i = 0; i <= lenght - 3 - lenght % 4; i += 4) {
+				liczba = num[i] * 1 + num[i + 1] * 2 + num[i + 2] * 4 + num[i + 3] * 8;
+				//textBox5->Text += Convert::ToString(liczba); textBox5->Text += ";";
+				func[liczba] = func[liczba] + 1;
+			}
+			double chi = 0;
+			for (int j = 0; j < 16; ++j) {
+				chi = chi + 16.0 / lenght * 4.0 * pow(func[j], 2);
+			}
+			chi = chi - lenght / 4.0;
+			textBox5->Text += "Chi: ";
+			textBox5->Text += Convert::ToString(chi);
+			if (chi > 2.16 && chi < 46.17)
+				checkBox6->Checked = true;
+
 		}
-		chi = chi - lenght/ 4.0;
-		textBox5->Text += "Chi: ";
-		textBox5->Text += Convert::ToString(chi);
-		if (chi > 2.16 && chi < 46.17)
-			checkBox6->Checked = true;
 	}
-}
+
 private: System::Void label5_Click(System::Object^ sender, System::EventArgs^ e) {
 }
 private: System::Void hScrollBar1_Scroll(System::Object^ sender, System::Windows::Forms::ScrollEventArgs^ e) {
+}
+private: System::Void label3_Click(System::Object^ sender, System::EventArgs^ e) {
 }
 };
 }
